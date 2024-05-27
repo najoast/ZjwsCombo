@@ -5,6 +5,7 @@ local Combinations = require "Combinations"
 
 local tinsert = table.insert
 
+----------------------------------------------------------------
 local HERO_COUNT_PER_BUILD = 4
 
 local IDX_Rage         = 1 -- 怒技
@@ -13,6 +14,10 @@ local IDX_Chase1       = 3 -- 追击条件
 local IDX_Chase2       = 4 -- 追击结果
 local IDX_Name         = 5 -- 英雄名
 
+-- 分割线
+local SPLIT_LINE = "-----------------------------------------------------------"
+
+----------------------------------------------------------------
 local Combo = {}
 
 local function GetAllCombinations()
@@ -70,7 +75,7 @@ end
 local function GenerateComboPreview(build, heroes, groupedCombos)
 	local report = {
 		table.concat(build, ","),
-		"-----------------------------------------------------------",
+		SPLIT_LINE,
 	}
 	for i = #groupedCombos, 2, -1 do
 		local combos = groupedCombos[i]
@@ -85,16 +90,16 @@ local function GenerateComboPreview(build, heroes, groupedCombos)
 				end
 				tinsert(report, table.concat(result, " | "))
 			end
-			tinsert(report, "-----------------------------------------------------------")
+			tinsert(report, SPLIT_LINE)
 		end
 	end
 	return table.concat(report, "\n")
 end
 
 local function ParseComboTrigger(heroes, combo)
+	local trigger = {}
 	for _, v in ipairs(combo) do
 		local hero = heroes[v]
-		tinsert(result, hero[IDX_Name] .. ":" .. hero[IDX_Chase1] .. "->" .. hero[IDX_Chase2])
 	end
 end
 
@@ -112,7 +117,7 @@ local function GenerateComboDetails(heroes, groupedCombos)
 				end
 				tinsert(report, table.concat(result, " | "))
 			end
-			tinsert(report, "-----------------------------------------------------------")
+			tinsert(report, SPLIT_LINE)
 		end
 	end
 	return table.concat(report, "\n")
