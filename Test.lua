@@ -2,6 +2,13 @@
 
 local Combo = require "Combo"
 
+local Team1 = {
+	"关羽",
+	"诸葛亮",
+	"赵云",
+	"周瑜",
+}
+
 -- 吴国暴击队
 local Team2 = {
 	"凌统",
@@ -36,4 +43,4 @@ local Team5 = {
 	-- "甘宁",
 }
 
-print(Combo.AnalysisBuild(Team2))
+print(Combo.AnalysisBuild(Team1))
