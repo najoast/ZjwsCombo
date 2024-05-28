@@ -72,9 +72,13 @@ end
 		},
 	}
 ]]
-local function GenerateComboPreview(build, heroes, groupedCombos)
+
+---@param title string
+---@param callback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo预览下面（缩进一个Tab）
+local function GenerateComboReport(build, heroes, groupedCombos, title, callback)
 	local report = {
-		table.concat(build, ","),
+		"阵容：" .. table.concat(build, ","),
+		title,
 		SPLIT_LINE,
 	}
 	for i = #groupedCombos, 2, -1 do
@@ -89,38 +93,70 @@ local function GenerateComboPreview(build, heroes, groupedCombos)
 					tinsert(result, hero[IDX_Name] .. ":" .. hero[IDX_Chase1] .. "->" .. hero[IDX_Chase2])
 				end
 				tinsert(report, table.concat(result, " | "))
-			end
-			tinsert(report, SPLIT_LINE)
-		end
-	end
-	return table.concat(report, "\n")
-end
-
-local function ParseComboTrigger(heroes, combo)
-	local trigger = {}
-	for _, v in ipairs(combo) do
-		local hero = heroes[v]
-	end
-end
-
-local function GenerateComboDetails(heroes, groupedCombos)
-	local report = {}
-	for i = #groupedCombos, 2, -1 do
-		local combos = groupedCombos[i]
-		if #combos > 0 then
-			tinsert(report, string.format("%d连（共%d个）", i, #combos))
-			for _, combo in ipairs(combos) do
-				local result = {}
-				for _, v in ipairs(combo) do
-					local hero = heroes[v]
-					tinsert(result, hero[IDX_Name] .. ":" .. hero[IDX_Chase1] .. "->" .. hero[IDX_Chase2])
+				if callback then
+					tinsert(report, callback(combo))
 				end
-				tinsert(report, table.concat(result, " | "))
 			end
 			tinsert(report, SPLIT_LINE)
 		end
 	end
 	return table.concat(report, "\n")
+end
+
+local function GenerateComboPreview(build, heroes, groupedCombos)
+	return GenerateComboReport(build, heroes, groupedCombos, "连击预览:")
+end
+
+-- 判断怒技（大招）是否能触发连击
+local function CanTriggerByRage(hero, heroes, combo)
+	-- 放怒技时，除了部分英雄有概率能触发连击外，大部分不能触发
+	-- 这里简单处理，就假定所有英雄的怒技都不能触发连击
+
+	-- 大招一定不能触发4连
+	if #combo >= HERO_COUNT_PER_BUILD then
+		return false
+	end
+
+	-- 如果自身在combo中，直接返回false
+	for _, v in ipairs(combo) do
+		if hero[IDX_Name] == heroes[v][IDX_Name] then
+			return false
+		end
+	end
+
+	return hero[IDX_Rage] == heroes[1][IDX_Chase1]
+end
+
+local function GenerateComboDetails(build, heroes, groupedCombos)
+	return GenerateComboReport(build, heroes, groupedCombos, "连击详情:", function(combo)
+		local firstCondition = heroes[combo[1]][IDX_Chase1]
+		local triggerRage = {}
+		local triggerNormalAtk = {}
+		for _, v in ipairs(combo) do
+			local hero = heroes[v]
+			-- 普攻触发
+			if hero[IDX_NormalAttack] == firstCondition then
+				tinsert(triggerNormalAtk, hero[IDX_Name])
+			end
+			-- 怒技触发
+			if CanTriggerByRage(hero, heroes, combo) then
+				tinsert(triggerRage, hero[IDX_Name])
+			end
+		end
+		-- 生成触发报告
+		local report = {}
+		local PREFIX = "\t"
+		local normalAtkCount = #triggerNormalAtk
+		local rageCount = #triggerRage
+		tinsert(report, string.format("%s总触发：%d, 普攻触发：%d, 怒技触发：%d", PREFIX, normalAtkCount + rageCount, normalAtkCount, rageCount))
+		if normalAtkCount > 0 then
+			tinsert(report, string.format("%s普攻触发：%s", PREFIX, table.concat(triggerNormalAtk, " | ")))
+		end
+		if rageCount > 0 then
+			tinsert(report, string.format("%s怒技触发：%s", PREFIX, table.concat(triggerRage, " | ")))
+		end
+		return table.concat(report, "\n")
+	end)
 end
 
 local function HashCombo(combo)
@@ -159,7 +195,7 @@ function Combo.AnalysisBuild(build)
 		tinsert(groupedCombos[#combo], combo)
 	end
 	groupedCombos = RemoveDuplicates(groupedCombos)
-	return GenerateComboPreview(build, heroes, groupedCombos)
+	return GenerateComboPreview(build, heroes, groupedCombos), GenerateComboDetails(build, heroes, groupedCombos)
 end
 
 return Combo
