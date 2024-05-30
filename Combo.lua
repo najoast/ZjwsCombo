@@ -6,7 +6,8 @@ local Combinations = require "Combinations"
 local tinsert = table.insert
 
 ----------------------------------------------------------------
-local HERO_COUNT_PER_BUILD = 4
+
+local MIN_HEROES_COUNT = 2
 
 local IDX_Rage         = 1 -- 怒技
 local IDX_NormalAttack = 2 -- 普攻
@@ -20,13 +21,9 @@ local SPLIT_LINE = "-----------------------------------------------------------"
 ----------------------------------------------------------------
 local Combo = {}
 
-local function GetAllCombinations()
-	return Combinations.GenerateAllCombinations(HERO_COUNT_PER_BUILD)
-end
-
 local function AnalysisCombination(heroes, combination)
 	local combo = { combination[1] }
-	for i = 2, HERO_COUNT_PER_BUILD do
+	for i = MIN_HEROES_COUNT, #heroes do
 		local lastHero = heroes[combination[i-1]]
 		local curHero = heroes[combination[i]]
 		if lastHero[IDX_Chase2] == "/" then
@@ -81,7 +78,7 @@ local function GenerateComboReport(build, heroes, groupedCombos, title, lineCall
 		title,
 		SPLIT_LINE,
 	}
-	for i = #groupedCombos, 2, -1 do
+	for i = #groupedCombos, MIN_HEROES_COUNT, -1 do
 		local combos = groupedCombos[i]
 		if #combos > 0 then
 			-- 连击预览
@@ -118,7 +115,7 @@ local function CanTriggerByRage(hero, heroes, combo)
 	-- 这里简单处理，就假定所有英雄的怒技都不能触发连击
 
 	-- 大招一定不能触发4连
-	if #combo >= HERO_COUNT_PER_BUILD then
+	if #combo >= #heroes then
 		return false
 	end
 
@@ -130,6 +127,14 @@ local function CanTriggerByRage(hero, heroes, combo)
 	end
 
 	return hero[IDX_Rage] == heroes[1][IDX_Chase1]
+end
+
+local function NewGroupedCombos(n)
+	local groupedCombos = {}
+	for _ = 1, n do
+		tinsert(groupedCombos, {})
+	end
+	return groupedCombos
 end
 
 local function GenerateComboDetails(build, heroes, groupedCombos)
@@ -187,8 +192,9 @@ end
 
 -- 去重
 local function RemoveDuplicates(groupedCombos)
-	local uniqueGroupedCombos = {{},{},{},{}}
-	for _, combos in ipairs(groupedCombos) do
+	local uniqueGroupedCombos = NewGroupedCombos(#groupedCombos)
+	for i = 1, #groupedCombos do
+		local combos = groupedCombos[i]
 		local hashMap = {}
 		for _, combo in ipairs(combos) do
 			local hashValue = HashCombo(combo)
@@ -202,11 +208,11 @@ local function RemoveDuplicates(groupedCombos)
 end
 
 function Combo.AnalysisBuild(build)
-	if #build ~= HERO_COUNT_PER_BUILD then
-		error("指尖无双 追击技能组合: 需要指定" .. HERO_COUNT_PER_BUILD .. "个英雄")
+	if #build < MIN_HEROES_COUNT then
+		return "至少" .. MIN_HEROES_COUNT .."个英雄"
 	end
-	local combinations = GetAllCombinations()
-	local groupedCombos = {{},{},{},{}}
+	local combinations = Combinations.GenerateAllCombinations(#build)
+	local groupedCombos = NewGroupedCombos(#build)
 	local heroes = Build2Heroes(build)
 	for _, combination in ipairs(combinations) do
 		local combo = AnalysisCombination(heroes, combination)
