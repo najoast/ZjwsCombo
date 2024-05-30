@@ -74,8 +74,8 @@ end
 ]]
 
 ---@param title string
----@param callback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo预览下面（缩进一个Tab）
-local function GenerateComboReport(build, heroes, groupedCombos, title, callback)
+---@param lineCallback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo预览下面（缩进一个Tab）
+local function GenerateComboReport(build, heroes, groupedCombos, title, lineCallback, sectionCallback)
 	local report = {
 		"阵容：" .. table.concat(build, ","),
 		title,
@@ -92,10 +92,15 @@ local function GenerateComboReport(build, heroes, groupedCombos, title, callback
 					local hero = heroes[v]
 					tinsert(result, hero[IDX_Name] .. ":" .. hero[IDX_Chase1] .. "->" .. hero[IDX_Chase2])
 				end
-				tinsert(report, table.concat(result, " | "))
-				if callback then
-					tinsert(report, callback(combo))
+				local line = table.concat(result, " | ")
+				if lineCallback then
+					-- tinsert(report, callback(combo))
+					line = line .. (lineCallback(combo) or "")
 				end
+				tinsert(report, line)
+			end
+			if sectionCallback then
+				tinsert(report, sectionCallback(i, combos))
 			end
 			tinsert(report, SPLIT_LINE)
 		end
@@ -128,7 +133,9 @@ local function CanTriggerByRage(hero, heroes, combo)
 end
 
 local function GenerateComboDetails(build, heroes, groupedCombos)
-	return GenerateComboReport(build, heroes, groupedCombos, "连击详情:", function(combo)
+	local totalTriggerCount = 0
+
+	local function LineCallback(combo)
 		local firstCondition = heroes[combo[1]][IDX_Chase1]
 		local triggerRage = {}
 		local triggerNormalAtk = {}
@@ -144,19 +151,30 @@ local function GenerateComboDetails(build, heroes, groupedCombos)
 			end
 		end
 		-- 生成触发报告
-		local report = {}
-		local PREFIX = "\t"
 		local normalAtkCount = #triggerNormalAtk
 		local rageCount = #triggerRage
-		tinsert(report, string.format("%s总触发：%d, 普攻触发：%d, 怒技触发：%d", PREFIX, normalAtkCount + rageCount, normalAtkCount, rageCount))
-		if normalAtkCount > 0 then
-			tinsert(report, string.format("%s普攻触发：%s", PREFIX, table.concat(triggerNormalAtk, " | ")))
+		local triggerCount = normalAtkCount + rageCount
+		local triggerReport = { "总触发:" .. triggerCount }
+		totalTriggerCount = totalTriggerCount + triggerCount
+		-- 总触发4,普攻触发3,怒技触发1,普攻:关羽/诸葛亮/赵云,怒技:周瑜
+		if triggerCount > 0 then
+			if normalAtkCount > 0 then
+				tinsert(triggerReport, "普攻" .. normalAtkCount .. ":" .. table.concat(triggerNormalAtk, "/"))
+			end
+			if rageCount > 0 then
+				tinsert(triggerReport, "怒技" .. rageCount .. ":" .. table.concat(triggerRage, "/"))
+			end
 		end
-		if rageCount > 0 then
-			tinsert(report, string.format("%s怒技触发：%s", PREFIX, table.concat(triggerRage, " | ")))
-		end
-		return table.concat(report, "\n")
-	end)
+		return " (" .. table.concat(triggerReport,",") .. ")"
+	end
+
+	local function SectionCallback(i)
+		local count = totalTriggerCount
+		totalTriggerCount = 0
+		return i .. "连总触发:" .. count
+	end
+
+	return GenerateComboReport(build, heroes, groupedCombos, "连击详情:", LineCallback, SectionCallback)
 end
 
 local function HashCombo(combo)
@@ -195,7 +213,8 @@ function Combo.AnalysisBuild(build)
 		tinsert(groupedCombos[#combo], combo)
 	end
 	groupedCombos = RemoveDuplicates(groupedCombos)
-	return GenerateComboPreview(build, heroes, groupedCombos), GenerateComboDetails(build, heroes, groupedCombos)
+	-- return GenerateComboPreview(build, heroes, groupedCombos) .. "\n\n" .. GenerateComboDetails(build, heroes, groupedCombos)
+	return GenerateComboDetails(build, heroes, groupedCombos)
 end
 
 return Combo
