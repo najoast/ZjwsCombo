@@ -159,7 +159,12 @@ local function GenerateComboDetails(build, heroes, groupedCombos)
 		local normalAtkCount = #triggerNormalAtk
 		local rageCount = #triggerRage
 		local triggerCount = normalAtkCount + rageCount
-		local triggerReport = { "总触发:" .. triggerCount }
+		local triggerReport = {}
+		if firstCondition == "反击" then
+			tinsert(triggerReport, "触发:等于对面阵容的追击触发次数")
+		else
+			tinsert(triggerReport, "触发:" .. triggerCount)
+		end
 		totalTriggerCount = totalTriggerCount + triggerCount
 		-- 总触发4,普攻触发3,怒技触发1,普攻:关羽/诸葛亮/赵云,怒技:周瑜
 		if triggerCount > 0 then
