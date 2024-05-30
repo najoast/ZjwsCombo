@@ -42,6 +42,9 @@ local function Build2Heroes(build)
 	local heroes = {}
 	for _, v in ipairs(build) do
 		local hero = Heroes[v]
+		if not hero then
+			error(string.format("Hero %s not found", tostring(v)))
+		end
 		hero[IDX_Name] = v
 		tinsert(heroes, hero)
 	end
