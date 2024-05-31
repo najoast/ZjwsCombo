@@ -18,6 +18,12 @@ local IDX_Name         = 5 -- 英雄名
 -- 分割线
 local SPLIT_LINE = "-----------------------------------------------------------"
 
+local VALID_CHASES = {
+	["浮空"] = true,
+	["倒地"] = true,
+	["击退"] = true,
+}
+
 ----------------------------------------------------------------
 local Combo = {}
 
@@ -73,8 +79,10 @@ end
 	}
 ]]
 
+--- 生成连击报告
 ---@param title string
----@param lineCallback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo预览下面（缩进一个Tab）
+---@param lineCallback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo 行尾
+---@param sectionCallback fun(combo:table):string @ 每段Combos的回调，返回内容显示在段首（段是以几连划分的，比如4连是一段，3连是一段）
 local function GenerateComboReport(build, heroes, groupedCombos, title, lineCallback, sectionCallback)
 	local report = {
 		"阵容：" .. table.concat(build, ","),
@@ -112,24 +120,24 @@ local function GenerateComboPreview(build, heroes, groupedCombos)
 	return GenerateComboReport(build, heroes, groupedCombos, "连击预览:")
 end
 
--- 判断怒技（大招）是否能触发连击
+-- 判断怒技（大招）是否能触发追击
 local function CanTriggerByRage(hero, heroes, combo)
-	-- 放怒技时，除了部分英雄有概率能触发连击外，大部分不能触发
-	-- 这里简单处理，就假定所有英雄的怒技都不能触发连击
+	-- 放大招时，并不能稳定触发追击，因为大招有持续时间，在持续时间内是不参与追击的，
+	-- 但如果大招快放完时触发了效果，那就可以参与追击。
 
-	-- 大招一定不能触发4连
-	if #combo >= #heroes then
+	-- 如果自身在combo中，直接返回false
+	-- for _, v in ipairs(combo) do
+	-- 	if hero[IDX_Name] == heroes[v][IDX_Name] then
+	-- 		return false
+	-- 	end
+	-- end
+
+	local rageEffect = hero[IDX_Rage]
+	if not VALID_CHASES[rageEffect] then
 		return false
 	end
 
-	-- 如果自身在combo中，直接返回false
-	for _, v in ipairs(combo) do
-		if hero[IDX_Name] == heroes[v][IDX_Name] then
-			return false
-		end
-	end
-
-	return hero[IDX_Rage] == heroes[1][IDX_Chase1]
+	return rageEffect == heroes[1][IDX_Chase1]
 end
 
 local function NewGroupedCombos(n)
@@ -215,10 +223,26 @@ local function RemoveDuplicates(groupedCombos)
 	return uniqueGroupedCombos
 end
 
-function Combo.AnalysisBuild(build)
+local function IsValidBuild(build)
 	if #build < MIN_HEROES_COUNT then
 		return "至少" .. MIN_HEROES_COUNT .."个英雄"
 	end
+	local m = {}
+	for _, v in ipairs(build) do
+		if not m[v] then
+			m[v] = true
+		else
+			return "英雄[" .. v .. "]重复"
+		end
+	end
+end
+
+function Combo.AnalysisBuild(build)
+	local err = IsValidBuild(build)
+	if err then
+		return err
+	end
+
 	local combinations = Combinations.GenerateAllCombinations(#build)
 	local groupedCombos = NewGroupedCombos(#build)
 	local heroes = Build2Heroes(build)
