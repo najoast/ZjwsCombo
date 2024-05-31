@@ -201,7 +201,7 @@ end
 local function HashCombo(combo)
 	local value = 0
 	for i, v in ipairs(combo) do
-		value = value + (v * math.pow(10, i - 1))
+		value = value + (v * 10^(i-1))
 	end
 	return value
 end
