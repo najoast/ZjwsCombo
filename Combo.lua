@@ -1,6 +1,6 @@
 -- 指尖无双 追击技能组合
 
-local Heroes = require "Config.Heroes"
+local Heroes = require "Heroes"
 local Combinations = require "Combinations"
 
 local tinsert = table.insert
