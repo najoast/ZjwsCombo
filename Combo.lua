@@ -49,12 +49,12 @@ local function Build2Heroes(build)
 	for _, v in ipairs(build) do
 		local hero = Heroes[v]
 		if not hero then
-			error(string.format("Hero %s not found", tostring(v)))
+			return string.format("英雄[%s]不存在", tostring(v))
 		end
 		hero[IDX_Name] = v
 		tinsert(heroes, hero)
 	end
-	return heroes
+	return nil, heroes
 end
 
 --[[
@@ -240,7 +240,11 @@ function Combo.AnalysisBuild(build)
 
 	local combinations = Combinations.GenerateAllCombinations(#build)
 	local groupedCombos = NewGroupedCombos(#build)
-	local heroes = Build2Heroes(build)
+	local err, heroes = Build2Heroes(build)
+	if err then
+		return err
+	end
+
 	for _, combination in ipairs(combinations) do
 		local combo = AnalysisCombination(heroes, combination)
 		tinsert(groupedCombos[#combo], combo)
