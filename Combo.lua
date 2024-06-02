@@ -121,23 +121,16 @@ local function GenerateComboPreview(build, heroes, groupedCombos)
 end
 
 -- 判断怒技（大招）是否能触发追击
-local function CanTriggerByRage(hero, heroes, combo)
+local function CanTriggerByRage(hero, firstCondition)
 	-- 放大招时，并不能稳定触发追击，因为大招有持续时间，在持续时间内是不参与追击的，
 	-- 但如果大招快放完时触发了效果，那就可以参与追击。
-
-	-- 如果自身在combo中，直接返回false
-	-- for _, v in ipairs(combo) do
-	-- 	if hero[IDX_Name] == heroes[v][IDX_Name] then
-	-- 		return false
-	-- 	end
-	-- end
 
 	local rageEffect = hero[IDX_Rage]
 	if not VALID_CHASES[rageEffect] then
 		return false
 	end
 
-	return rageEffect == heroes[1][IDX_Chase1]
+	return rageEffect == firstCondition
 end
 
 local function NewGroupedCombos(n)
@@ -152,17 +145,19 @@ local function GenerateComboDetails(build, heroes, groupedCombos)
 	local totalTriggerCount = 0
 
 	local function LineCallback(combo)
+		print(table.concat(combo, " "))
 		local firstCondition = heroes[combo[1]][IDX_Chase1]
 		local triggerRage = {}
 		local triggerNormalAtk = {}
 		for _, v in ipairs(combo) do
 			local hero = heroes[v]
 			-- 普攻触发
+			print("==>", #combo, hero[IDX_NormalAttack], firstCondition)
 			if hero[IDX_NormalAttack] == firstCondition then
 				tinsert(triggerNormalAtk, hero[IDX_Name])
 			end
 			-- 怒技触发
-			if CanTriggerByRage(hero, heroes, combo) then
+			if CanTriggerByRage(hero, firstCondition) then
 				tinsert(triggerRage, hero[IDX_Name])
 			end
 		end
