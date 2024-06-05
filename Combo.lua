@@ -85,7 +85,7 @@ end
 ---@param sectionCallback fun(combo:table):string @ 每段Combos的回调，返回内容显示在段首（段是以几连划分的，比如4连是一段，3连是一段）
 local function GenerateComboReport(build, heroes, groupedCombos, title, lineCallback, sectionCallback)
 	local report = {
-		"阵容：" .. table.concat(build, ","),
+		"阵容：" .. table.concat(build, " "),
 		title,
 		SPLIT_LINE,
 	}
