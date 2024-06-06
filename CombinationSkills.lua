@@ -1,6 +1,6 @@
 local Heroes = require "Heroes"
 
-local IDX_Faction = Heroes.Indexes.Faction
+local IDX_Faction = Heroes.GetIndexes().Faction
 
 local COMBINATION_SKILLS = {
 	["龙吟九天"] = {
@@ -133,7 +133,7 @@ local M = {}
 function M.AnalysisCombinationSkill(build)
 	local heroName2Faction = {}
 	for _, heroName in ipairs(build) do
-		local hero = Heroes[heroName]
+		local hero = Heroes.GetHero(heroName)
 		heroName2Faction[heroName] = hero[IDX_Faction]
 	end
 
