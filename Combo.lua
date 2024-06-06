@@ -95,13 +95,14 @@ end
 ---@param lineCallback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo 行尾
 ---@param sectionCallback fun(combo:table):string @ 每段Combos的回调，返回内容显示在段首（段是以几连划分的，比如4连是一段，3连是一段）
 local function GenerateComboReport(build, heroes, groupedCombos, title, lineCallback, sectionCallback)
+	local report = { "阵容：" .. BuildStr(build) }
 	local combinationSkill, desc = CombinationSkills.AnalysisCombinationSkill(build)
-	local report = {
-		"阵容：" .. BuildStr(build),
-		combinationSkill and string.format("合体技：%s (%s)", combinationSkill, desc) or nil,
-		title,
-		SPLIT_LINE,
-	}
+	if combinationSkill then
+		tinsert(report, string.format("合体技：%s (%s)", combinationSkill, desc))
+	end
+	tinsert(report, title)
+	tinsert(report, SPLIT_LINE)
+
 	for i = #groupedCombos, MIN_HEROES_COUNT, -1 do
 		local combos = groupedCombos[i]
 		if #combos > 0 then

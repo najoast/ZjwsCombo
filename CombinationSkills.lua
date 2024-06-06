@@ -4,7 +4,7 @@ local IDX_Faction = Heroes.Indexes.Faction
 
 local COMBINATION_SKILLS = {
 	["龙吟九天"] = {
-		desc = "召唤大量神龙攻击敌方，造成大量伤害。",
+		desc = "召唤大量神龙攻击敌方，造成大量伤害",
 		condition = {
 			optional = {
 				min = 4,
@@ -14,14 +14,14 @@ local COMBINATION_SKILLS = {
 		priority = 1,
 	},
 	["孙刘联盟"] = {
-		desc = "幻化出火凤与白虎攻击所有敌方，造成大量伤害。",
+		desc = "幻化出火凤与白虎攻击所有敌方，造成大量伤害",
 		condition = {
 			required = {"诸葛亮","蜀","吴"},
 		},
 		priority = 1,
 	},
 	["火凤燎原"] = {
-		desc = "化身为火凤焚烧所有敌方，造成大量伤害。",
+		desc = "化身为火凤焚烧所有敌方，造成大量伤害",
 		condition = {
 			optional = {
 				min = 4,
@@ -31,14 +31,14 @@ local COMBINATION_SKILLS = {
 		priority = 1,
 	},
 	["龙舞蝶"] = {
-		desc = "幻化出金龙与蝴蝶攻击范围内敌方，造成大量伤害。",
+		desc = "幻化出金龙与蝴蝶攻击范围内敌方，造成大量伤害",
 		condition = {
 			required = {"吕布","貂蝉"},
 		},
 		priority = 1,
 	},
 	["五虎上将"] = {
-		desc = "化身为白虎连续攻击敌方，造成大量伤害。",
+		desc = "化身为白虎连续攻击敌方，造成大量伤害",
 		condition = {
 			optional = {
 				min = 4,
@@ -48,28 +48,28 @@ local COMBINATION_SKILLS = {
 		priority = 1,
 	},
 	["群英荟萃"] = {
-		desc = "化身为龙卷风摧毁敌方，造成大量伤害。",
+		desc = "化身为龙卷风摧毁敌方，造成大量伤害",
 		condition = {
 			required = {"群","群","群"},
 		},
 		priority = 0,
 	},
 	["江东豪杰"] = {
-		desc = "化身为龙卷风摧毁敌方，造成大量伤害。",
+		desc = "化身为龙卷风摧毁敌方，造成大量伤害",
 		condition = {
 			required = {"吴","吴","吴"},
 		},
 		priority = 0,
 	},
 	["魏武雄狮"] = {
-		desc = "化身为龙卷风摧毁敌方，造成大量伤害。",
+		desc = "化身为龙卷风摧毁敌方，造成大量伤害",
 		condition = {
 			required = {"魏","魏","魏"},
 		},
 		priority = 0,
 	},
 	["蜀汉之志"] = {
-		desc = "化身为龙卷风摧毁敌方，造成大量伤害。",
+		desc = "化身为龙卷风摧毁敌方，造成大量伤害",
 		condition = {
 			required = {"蜀","蜀","蜀"},
 		},
@@ -161,7 +161,9 @@ function M.AnalysisCombinationSkill(build)
 	end
 
 	local skill = SelectOneSkill(matchedSkills)
-	return skill, COMBINATION_SKILLS[skill].desc
+	if skill then
+		return skill, COMBINATION_SKILLS[skill].desc
+	end
 end
 
 return M
