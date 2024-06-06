@@ -2,6 +2,7 @@
 
 local Heroes = require "Heroes"
 local Combinations = require "Combinations"
+local CombinationSkills = require "CombinationSkills"
 
 local tinsert = table.insert
 
@@ -9,11 +10,12 @@ local tinsert = table.insert
 
 local MIN_HEROES_COUNT = 2
 
-local IDX_Rage         = 1 -- 怒技
-local IDX_NormalAttack = 2 -- 普攻
-local IDX_Chase1       = 3 -- 追击条件
-local IDX_Chase2       = 4 -- 追击结果
-local IDX_Name         = 5 -- 英雄名
+local IDX_Name         = Heroes.Indexes.Name
+local IDX_Rage         = Heroes.Indexes.Rage
+local IDX_NormalAttack = Heroes.Indexes.NormalAttack
+local IDX_Chase1       = Heroes.Indexes.Chase1
+local IDX_Chase2       = Heroes.Indexes.Chase2
+local IDX_Faction      = Heroes.Indexes.Faction
 
 -- 分割线
 local SPLIT_LINE = "-----------------------------------------------------------"
@@ -79,13 +81,24 @@ end
 	}
 ]]
 
+local function BuildStr(build)
+	local str = ""
+	for _, heroName in ipairs(build) do
+		local hero = Heroes[heroName]
+		str = str .. string.format("%s(%s)  ", hero[IDX_Name], hero[IDX_Faction])
+	end
+	return str
+end
+
 --- 生成连击报告
 ---@param title string
 ---@param lineCallback fun(combo:table):string @ 每个Combo的回调，返回内容显示在Combo 行尾
 ---@param sectionCallback fun(combo:table):string @ 每段Combos的回调，返回内容显示在段首（段是以几连划分的，比如4连是一段，3连是一段）
 local function GenerateComboReport(build, heroes, groupedCombos, title, lineCallback, sectionCallback)
+	local combinationSkill, desc = CombinationSkills.AnalysisCombinationSkill(build)
 	local report = {
-		"阵容：" .. table.concat(build, " "),
+		"阵容：" .. BuildStr(build),
+		combinationSkill and string.format("合体技：%s (%s)", combinationSkill, desc) or nil,
 		title,
 		SPLIT_LINE,
 	}
