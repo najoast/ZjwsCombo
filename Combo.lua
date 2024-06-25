@@ -10,12 +10,14 @@ local tinsert = table.insert
 
 local MIN_HEROES_COUNT = 2
 
-local IDX_Name         = Heroes.Indexes.Name
-local IDX_Rage         = Heroes.Indexes.Rage
-local IDX_NormalAttack = Heroes.Indexes.NormalAttack
-local IDX_Chase1       = Heroes.Indexes.Chase1
-local IDX_Chase2       = Heroes.Indexes.Chase2
-local IDX_Faction      = Heroes.Indexes.Faction
+local Indexes = Heroes.GetIndexes()
+
+local IDX_Name         = Indexes.Name
+local IDX_Rage         = Indexes.Rage
+local IDX_NormalAttack = Indexes.NormalAttack
+local IDX_Chase1       = Indexes.Chase1
+local IDX_Chase2       = Indexes.Chase2
+local IDX_Faction      = Indexes.Faction
 
 -- 分割线
 local SPLIT_LINE = "-----------------------------------------------------------"
@@ -48,12 +50,12 @@ end
 
 local function Build2Heroes(build)
 	local heroes = {}
-	for _, v in ipairs(build) do
-		local hero = Heroes[v]
+	for _, heroName in ipairs(build) do
+		local hero = Heroes.GetHero(heroName)
 		if not hero then
-			return string.format("英雄[%s]不存在", tostring(v))
+			return string.format("英雄[%s]不存在", tostring(heroName))
 		end
-		hero[IDX_Name] = v
+		hero[IDX_Name] = heroName
 		tinsert(heroes, hero)
 	end
 	return nil, heroes
@@ -84,7 +86,7 @@ end
 local function BuildStr(build)
 	local str = ""
 	for _, heroName in ipairs(build) do
-		local hero = Heroes[heroName]
+		local hero = Heroes.GetHero(heroName)
 		str = str .. string.format("%s(%s)  ", hero[IDX_Name], hero[IDX_Faction])
 	end
 	return str
