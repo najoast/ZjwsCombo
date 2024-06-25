@@ -52,16 +52,6 @@ local Heroes = {
 	{"司马徽","群","SR","击退","击退","浮空","/"},
 }
 
--- 错别字/外号/别名自适应
-Heroes["许诸"] = Heroes["许褚"]
-Heroes["许禇"] = Heroes["许褚"]
-Heroes["夏侯淳"] = Heroes["夏侯惇"]
-Heroes["张合"] = Heroes["张郃"]
-Heroes["司马微"] = Heroes["司马徽"]
-Heroes["司马"] = Heroes["司马徽"]
-Heroes["诸葛"] = Heroes["诸葛亮"]
-Heroes["骚猪"] = Heroes["董卓"]
-
 local Indexes = {
 	Name         = 1, -- 英雄名
 	Faction      = 2, -- 阵营
@@ -79,6 +69,16 @@ local IDX_Name = Indexes.Name
 for _, hero in ipairs(Heroes) do
 	HeroMap[hero[IDX_Name]] = hero
 end
+
+-- 错别字/外号/别名自适应
+HeroMap["许诸"] = HeroMap["许褚"]
+HeroMap["许禇"] = HeroMap["许褚"]
+HeroMap["夏侯淳"] = HeroMap["夏侯惇"]
+HeroMap["张合"] = HeroMap["张郃"]
+HeroMap["司马微"] = HeroMap["司马徽"]
+HeroMap["司马"] = HeroMap["司马徽"]
+HeroMap["诸葛"] = HeroMap["诸葛亮"]
+HeroMap["骚猪"] = HeroMap["董卓"]
 
 local M = {}
 
