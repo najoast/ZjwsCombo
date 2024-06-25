@@ -134,7 +134,7 @@ local function GenerateComboPreview(build, heroes, groupedCombos)
 	return GenerateComboReport(build, heroes, groupedCombos, "连击预览:")
 end
 
--- 判断怒技（大招）是否能触发追击
+-- 判断大招是否能触发追击
 local function CanTriggerByRage(hero, firstCondition)
 	-- 放大招时，并不能稳定触发追击，因为大招有持续时间，在持续时间内是不参与追击的，
 	-- 但如果大招快放完时触发了效果，那就可以参与追击。
@@ -170,7 +170,7 @@ local function GenerateComboDetails(build, heroes, groupedCombos)
 			if hero[IDX_NormalAttack] == firstCondition then
 				tinsert(triggerNormalAtk, hero[IDX_Name])
 			end
-			-- 怒技触发
+			-- 大招触发
 			if CanTriggerByRage(hero, firstCondition) then
 				tinsert(triggerRage, hero[IDX_Name])
 			end
@@ -186,13 +186,13 @@ local function GenerateComboDetails(build, heroes, groupedCombos)
 			tinsert(triggerReport, "触发:" .. triggerCount)
 		end
 		totalTriggerCount = totalTriggerCount + triggerCount
-		-- 总触发4,普攻触发3,怒技触发1,普攻:关羽/诸葛亮/赵云,怒技:周瑜
+		-- 总触发4,普攻触发3,大招触发1,普攻:关羽/诸葛亮/赵云,大招:周瑜
 		if triggerCount > 0 then
 			if normalAtkCount > 0 then
 				tinsert(triggerReport, "普攻" .. normalAtkCount .. ":" .. table.concat(triggerNormalAtk, "/"))
 			end
 			if rageCount > 0 then
-				tinsert(triggerReport, "怒技" .. rageCount .. ":" .. table.concat(triggerRage, "/"))
+				tinsert(triggerReport, "大招" .. rageCount .. ":" .. table.concat(triggerRage, "/"))
 			end
 		end
 		return " (" .. table.concat(triggerReport,",") .. ")"
