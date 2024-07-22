@@ -3,6 +3,48 @@ local Heroes = require "Heroes"
 local IDX_Faction = Heroes.GetIndexes().Faction
 
 local COMBINATION_SKILLS = {
+	-- S3
+	["君临天下"] = {
+		desc = "上阵曹操、1名魏国和1名群雄将领时激活合体，迅速建造铜雀台进行狂欢，造成大量伤害",
+		condition = {
+			optional = {
+				min = 3,
+				heroes = {"曹操","魏","群"},
+			},
+		},
+		priority = 2,
+	},
+	["地表最强"] = {
+		desc = "上阵4名展示的将领时激活合体，汇聚血色巨刀，造成大量伤害，必定暴击",
+		condition = {
+			optional = {
+				min = 4,
+				heroes = {"吕布","关羽","张飞","赵云","黄忠","马超","甘宁","典韦","张辽","夏侯渊","许褚","孙策","孙坚","太史慈","刑道荣"},
+			},
+		},
+		priority = 2,
+	},
+	["倾城绝艳"] = {
+		desc = "上阵4名展示的将领时激活合体，在战场中尽情舞蹈，造成大量伤害，并附带魅惑效果",
+		condition = {
+			optional = {
+				min = 4,
+				heroes = {"黄月英","甄姬","大乔","小乔","孙尚香","貂蝉","蔡文姬"},
+			},
+		},
+		priority = 2,
+	},
+	["富甲天下"] = {
+		desc = "上阵孙权、1名吴国和1名群雄将领时激活合体，向天空撒币，造成大量伤害",
+		condition = {
+			optional = {
+				min = 3,
+				heroes = {"孙权","吴","群"},
+			},
+		},
+		priority = 2,
+	},
+	-- S2
 	["龙吟九天"] = {
 		desc = "召唤大量神龙攻击敌方，造成大量伤害",
 		condition = {
