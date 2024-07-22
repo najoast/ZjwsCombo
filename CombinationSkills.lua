@@ -5,17 +5,14 @@ local IDX_Faction = Heroes.GetIndexes().Faction
 local COMBINATION_SKILLS = {
 	-- S3
 	["君临天下"] = {
-		desc = "上阵曹操、1名魏国和1名群雄将领时激活合体，迅速建造铜雀台进行狂欢，造成大量伤害",
+		desc = "上阵曹操、1名魏国和1名群雄将领时激活合体，迅速建造铜雀台进行狂欢，造成(大量)伤害",
 		condition = {
-			optional = {
-				min = 3,
-				heroes = {"曹操","魏","群"},
-			},
+			required = {"曹操","魏","群"},
 		},
 		priority = 2,
 	},
 	["地表最强"] = {
-		desc = "上阵4名展示的将领时激活合体，汇聚血色巨刀，造成大量伤害，必定暴击",
+		desc = "上阵4名展示的将领时激活合体，汇聚血色巨刀，造成(大量)伤害，必定暴击",
 		condition = {
 			optional = {
 				min = 4,
@@ -25,7 +22,7 @@ local COMBINATION_SKILLS = {
 		priority = 2,
 	},
 	["倾城绝艳"] = {
-		desc = "上阵4名展示的将领时激活合体，在战场中尽情舞蹈，造成大量伤害，并附带魅惑效果",
+		desc = "上阵4名展示的将领时激活合体，在战场中尽情舞蹈，造成(大量)伤害，并附带魅惑效果",
 		condition = {
 			optional = {
 				min = 4,
@@ -35,52 +32,49 @@ local COMBINATION_SKILLS = {
 		priority = 2,
 	},
 	["富甲天下"] = {
-		desc = "上阵孙权、1名吴国和1名群雄将领时激活合体，向天空撒币，造成大量伤害",
+		desc = "上阵孙权、1名吴国和1名群雄将领时激活合体，向天空撒币，造成(大量)伤害",
 		condition = {
-			optional = {
-				min = 3,
-				heroes = {"孙权","吴","群"},
-			},
+			required = {"孙权","吴","群"},
 		},
 		priority = 2,
 	},
 	-- S2
 	["龙吟九天"] = {
-		desc = "召唤大量神龙攻击敌方，造成大量伤害",
+		desc = "上阵4名展示的将领时激活合体，召唤大量神龙攻击敌方，造成(大量)伤害，并附带中毒效果，持续(中量)时间",
 		condition = {
 			optional = {
 				min = 4,
-				heroes = {"曹操","郭嘉","夏侯惇","典韦","张辽"},
+				heroes = {"荀彧","曹仁","曹操","郭嘉","夏侯惇","典韦","张辽"},
 			},
 		},
 		priority = 1,
 	},
 	["孙刘联盟"] = {
-		desc = "幻化出火凤与白虎攻击所有敌方，造成大量伤害",
+		desc = "上阵诸葛亮、1名蜀国和1名吴国时激活合体，幻化出火凤与白虎攻击所有敌方，造成(大量)伤害",
 		condition = {
 			required = {"诸葛亮","蜀","吴"},
 		},
 		priority = 1,
 	},
 	["火凤燎原"] = {
-		desc = "化身为火凤焚烧所有敌方，造成大量伤害",
+		desc = "上阵4名展示的将领时激活合体，化身为火凤焚烧所有敌方，造成(大量)伤害，并附带灼烧效果，持续(少量)时间",
 		condition = {
 			optional = {
 				min = 4,
-				heroes = {"孙策","周瑜","周泰","甘宁","小乔","黄盖"},
+				heroes = {"庞统","孙策","周瑜","周泰","甘宁","小乔","黄盖"},
 			},
 		},
 		priority = 1,
 	},
 	["龙舞蝶"] = {
-		desc = "幻化出金龙与蝴蝶攻击范围内敌方，造成大量伤害",
+		desc = "上阵吕布和貂蝉时激活合体，幻化出金龙与蝴蝶攻击范围内敌方，造成(大量)伤害，并附带魅惑效果，持续少量时间",
 		condition = {
 			required = {"吕布","貂蝉"},
 		},
 		priority = 1,
 	},
 	["五虎上将"] = {
-		desc = "化身为白虎连续攻击敌方，造成大量伤害",
+		desc = "上阵4名五虎将领时激活合体，化身为白虎连续攻击敌方，造成(大量)伤害，并获得霸体状态，持续(大量)时间",
 		condition = {
 			optional = {
 				min = 4,
@@ -168,6 +162,11 @@ local function SelectOneSkill(skills)
 	return skills[1]
 end
 
+-- 把 desc 里的 ( 替换为 <p style="color:red">, 把 ) 替换为 </p>
+local function ReplaceBrackets(desc)
+	return desc:gsub("%(", "<font color=\"green\">"):gsub("%)", "</font>")
+end
+
 local M = {}
 
 --- 分析组合技
@@ -204,7 +203,7 @@ function M.AnalysisCombinationSkill(build)
 
 	local skill = SelectOneSkill(matchedSkills)
 	if skill then
-		return skill, COMBINATION_SKILLS[skill].desc
+		return skill, ReplaceBrackets(COMBINATION_SKILLS[skill].desc)
 	end
 end
 
